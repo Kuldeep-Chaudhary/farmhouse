@@ -1,100 +1,149 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Group } from "three";
 import { Text3D } from "@react-three/drei";
 import GUI from "lil-gui";
-import { gatePosition, frontSpace } from "../constants";
+import { titleBoard } from "../../config";
 
 const TitleBoard: React.FC = () => {
   const boardRef = useRef<Group | null>(null);
-  const guiRef = useRef<GUI | null>(null); // 👈 GUI reference
+  const guiRef = useRef<GUI | null>(null);
 
   const [params, setParams] = useState({
-    color: "#ffffff",
-    posX: -21,
-    posY: 9,
-    posZ: 2,
-    leftPillarColor: "#888888",
-    rightPillarColor: "#888888",
-    boardColor: "#05a5a8",
+    color: titleBoard.textColor,
+    textPosition: [...titleBoard.textPosition],
+    leftPillarColor: titleBoard.leftPillarColor,
+    rightPillarColor: titleBoard.rightPillarColor,
+    boardColor: titleBoard.boardColor,
+    groupPosition: [...titleBoard.groupPosition],
+    directionalLightPosition: [...titleBoard.directionalLightPosition],
+    intensity: titleBoard.intensity,
+    pillarSize: [...titleBoard.pillarSize],
+    boardSize: [...titleBoard.boardSize],
+    boardPosition: [...titleBoard.boardPosition],
+    leftPillarPosition: [...titleBoard.leftPillarPosition],
+    rightPillarPosition: [...titleBoard.rightPillarPosition],
   });
 
-  const paramsRef = useRef(params);
-
-  useEffect(() => {
-    const gui = new GUI();
-    gui.title("TitleBoard Controls");
-    gui.hide(); // 👈 Hide GUI initially
-    guiRef.current = gui;
-
-    const updateParam = (key: keyof typeof params, value: any) => {
-      paramsRef.current = { ...paramsRef.current, [key]: value };
-      setParams(paramsRef.current);
-    };
-
-    // Text controls
-    const textFolder = gui.addFolder("Text3D");
-    textFolder.addColor(paramsRef.current, "color").onChange((v) => updateParam("color", v));
-    textFolder.add(paramsRef.current, "posX", -30, 30, 1).onChange((v) => updateParam("posX", v));
-    textFolder.add(paramsRef.current, "posY", -10, 10, 1).onChange((v) => updateParam("posY", v));
-    textFolder.add(paramsRef.current, "posZ", 0, 10, 1).onChange((v) => updateParam("posZ", v));
-
-    // Pillar controls
-    const pillarFolder = gui.addFolder("Pillars");
-    pillarFolder.addColor(paramsRef.current, "leftPillarColor").onChange((v) => updateParam("leftPillarColor", v));
-    pillarFolder.addColor(paramsRef.current, "rightPillarColor").onChange((v) => updateParam("rightPillarColor", v));
-
-    // Board controls
-    const boardFolder = gui.addFolder("Board");
-    boardFolder.addColor(paramsRef.current, "boardColor").onChange((v) => updateParam("boardColor", v));
-
-    return () => gui.destroy();
-  }, []);
-
-  // 👇 Toggle GUI on board click
-  const handleBoardClick = () => {
-    if (guiRef.current) {
-      const isHidden = guiRef.current._hidden; // internal state of lil-gui
-      isHidden ? guiRef.current.show() : guiRef.current.hide();
-    }
+  const updateParam = (key: keyof typeof params, value: any) => {
+    setParams((prev) => ({ ...prev, [key]: value }));
   };
 
-//   you want you open lil-gui click on board
+  const posUpdate = useCallback(
+    (key: keyof typeof params, index: number) => (v: number) => {
+      setParams((prev) => {
+        const updated = [...(prev[key] as number[])];
+        updated[index] = v;
+        return { ...prev, [key]: updated };
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const gui = new GUI();
+      gui.title("TitleBoard Controls");
+      gui.hide();
+      guiRef.current = gui;
+
+      const textFolder = gui.addFolder("Text3D");
+      textFolder.addColor(params, "color").onChange((v) => updateParam("color", v));
+      const textPos = textFolder.addFolder("Text Position");
+      textPos.add(params.textPosition, 0, -50, 50, 1).name("X").onChange(posUpdate("textPosition", 0));
+      textPos.add(params.textPosition, 1, -50, 50, 1).name("Y").onChange(posUpdate("textPosition", 1));
+      textPos.add(params.textPosition, 2, -50, 50, 1).name("Z").onChange(posUpdate("textPosition", 2));
+
+      const pillarFolder = gui.addFolder("Pillars");
+      pillarFolder.addColor(params, "leftPillarColor").onChange((v) => updateParam("leftPillarColor", v));
+      pillarFolder.addColor(params, "rightPillarColor").onChange((v) => updateParam("rightPillarColor", v));
+
+      const boardFolder = gui.addFolder("Board");
+      boardFolder.addColor(params, "boardColor").onChange((v) => updateParam("boardColor", v));
+
+      const advancedFolder = gui.addFolder("Advanced Config");
+
+      const groupPos = advancedFolder.addFolder("Group Position");
+      groupPos.add(params.groupPosition, 0, -30, 30, 1).name("X").onChange(posUpdate("groupPosition", 0));
+      groupPos.add(params.groupPosition, 1, -30, 30, 1).name("Y").onChange(posUpdate("groupPosition", 1));
+      groupPos.add(params.groupPosition, 2, -30, 30, 1).name("Z").onChange(posUpdate("groupPosition", 2));
+
+      const light = advancedFolder.addFolder("Directional Light");
+      light.add(params.directionalLightPosition, 0, -50, 50, 1).name("X").onChange(posUpdate("directionalLightPosition", 0));
+      light.add(params.directionalLightPosition, 1, -50, 50, 1).name("Y").onChange(posUpdate("directionalLightPosition", 1));
+      light.add(params.directionalLightPosition, 2, -50, 50, 1).name("Z").onChange(posUpdate("directionalLightPosition", 2));
+      light.add(params, "intensity", 0, 5, 0.1).name("Intensity").onChange((v) => updateParam("intensity", v));
+
+      const pillarSize = advancedFolder.addFolder("Pillar Size");
+      pillarSize.add(params.pillarSize, 0, 0.1, 10, 0.1).name("RadiusTop").onChange(posUpdate("pillarSize", 0));
+      pillarSize.add(params.pillarSize, 1, 0.1, 10, 0.1).name("RadiusBottom").onChange(posUpdate("pillarSize", 1));
+      pillarSize.add(params.pillarSize, 2, 1, 100, 1).name("Height").onChange(posUpdate("pillarSize", 2));
+      pillarSize.add(params.pillarSize, 3, 1, 64, 1).name("RadialSegments").onChange(posUpdate("pillarSize", 3));
+
+      const boardSize = advancedFolder.addFolder("Board Size");
+      boardSize.add(params.boardSize, 0, 1, 100, 1).name("Width").onChange(posUpdate("boardSize", 0));
+      boardSize.add(params.boardSize, 1, 1, 50, 1).name("Height").onChange(posUpdate("boardSize", 1));
+      boardSize.add(params.boardSize, 2, 0.1, 10, 0.1).name("Depth").onChange(posUpdate("boardSize", 2));
+
+      const boardPos = advancedFolder.addFolder("Board Position");
+      boardPos.add(params.boardPosition, 0, -50, 50, 1).name("X").onChange(posUpdate("boardPosition", 0));
+      boardPos.add(params.boardPosition, 1, -50, 50, 1).name("Y").onChange(posUpdate("boardPosition", 1));
+      boardPos.add(params.boardPosition, 2, -50, 50, 1).name("Z").onChange(posUpdate("boardPosition", 2));
+
+      const leftPos = advancedFolder.addFolder("Left Pillar Pos");
+      leftPos.add(params.leftPillarPosition, 0, -50, 0, 1).name("X").onChange(posUpdate("leftPillarPosition", 0));
+      leftPos.add(params.leftPillarPosition, 1, -10, 10, 1).name("Y").onChange(posUpdate("leftPillarPosition", 1));
+      leftPos.add(params.leftPillarPosition, 2, -10, 10, 1).name("Z").onChange(posUpdate("leftPillarPosition", 2));
+
+      const rightPos = advancedFolder.addFolder("Right Pillar Pos");
+      rightPos.add(params.rightPillarPosition, 0, 0, 50, 1).name("X").onChange(posUpdate("rightPillarPosition", 0));
+      rightPos.add(params.rightPillarPosition, 1, -10, 10, 1).name("Y").onChange(posUpdate("rightPillarPosition", 1));
+      rightPos.add(params.rightPillarPosition, 2, -10, 10, 1).name("Z").onChange(posUpdate("rightPillarPosition", 2));
+
+      return () => gui.destroy();
+    }
+  }, [params, posUpdate]);
+
+  const handleBoardClick = () => {
+    if (import.meta.env.DEV && guiRef.current) {
+      guiRef.current._hidden ? guiRef.current.show() : guiRef.current.hide();
+    }
+  };
 
   return (
     <>
       <ambientLight intensity={0.5} />
-      <directionalLight castShadow position={[10, 10, 10]} intensity={1.2} shadow-mapSize-width={1024} shadow-mapSize-height={1024} />
+      <directionalLight
+        castShadow
+        position={params.directionalLightPosition}
+        intensity={params.intensity}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
 
-      <group ref={boardRef} position={[0, 10, gatePosition + frontSpace / 2]}>
-        {/* Left Pillar */}
-        <mesh position={[-20, 0, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[1, 1, 20, 32]} />
+      <group ref={boardRef} position={params.groupPosition}>
+        <mesh position={params.leftPillarPosition} castShadow receiveShadow>
+          <cylinderGeometry args={params.pillarSize} />
           <meshStandardMaterial color={params.leftPillarColor} />
         </mesh>
 
-        {/* Right Pillar */}
-        <mesh position={[20, 0, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[1, 1, 20, 32]} />
+        <mesh position={params.rightPillarPosition} castShadow receiveShadow>
+          <cylinderGeometry args={params.pillarSize} />
           <meshStandardMaterial color={params.rightPillarColor} />
         </mesh>
 
-        {/* Board - click to toggle GUI */}
         <mesh
-          position={[0, 10, 1]}
+          position={params.boardPosition}
           castShadow
           receiveShadow
           onClick={(e) => {
             e.stopPropagation();
-            if (e.altKey) {
-              handleBoardClick(); // ✅ Now it works!
-            }
+            if (e.altKey) handleBoardClick();
           }}
         >
-          <boxGeometry args={[50, 5, 0.5]} />
+          <boxGeometry args={params.boardSize} />
           <meshStandardMaterial color={params.boardColor} />
         </mesh>
 
-        {/* Text */}
         <Text3D
           font="/fonts/helvetiker_regular.typeface.json"
           size={1.75}
@@ -105,7 +154,7 @@ const TitleBoard: React.FC = () => {
           bevelSize={0.02}
           bevelOffset={0}
           bevelSegments={5}
-          position={[params.posX, params.posY, params.posZ]}
+          position={params.textPosition}
           castShadow
           receiveShadow
         >

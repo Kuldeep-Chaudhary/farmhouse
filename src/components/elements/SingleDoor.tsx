@@ -6,7 +6,7 @@ interface SingleDoorProps {
   color?: string;
 }
 
-const SingleDoor: React.FC<SingleDoorProps> = ({ position, size, color = "pink" }) => {
+const SingleDoor: React.FC<SingleDoorProps> = ({ position, size, color = "#5d6d7e" }) => {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />

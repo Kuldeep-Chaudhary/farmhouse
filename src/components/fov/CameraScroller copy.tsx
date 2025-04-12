@@ -3,8 +3,15 @@ import { useThree, useFrame } from "@react-three/fiber";
 import { PerspectiveCamera, Vector3 } from "three";
 import gsap from "gsap";
 import GUI from "lil-gui";
-import { hutPositions } from "../constants";
+import { hutOffsetX, hutOffsetZ } from "../constants";
 
+// Hut positions
+const hutPositions: [number, number, number][] = [
+  [-hutOffsetX, 0, hutOffsetZ - hutOffsetZ / 1.2],
+  [hutOffsetX, 0, hutOffsetZ - hutOffsetZ / 1.2],
+  [-hutOffsetX, 0, -hutOffsetZ],
+  [hutOffsetX, 0, -hutOffsetZ],
+];
 
 // Camera focus positions (position + lookAt)
 interface FocusPosition {
@@ -19,7 +26,7 @@ const hutFocusPositions: FocusPosition[] = hutPositions.map(([x, y, z]) => ({
 
 // Default camera view (like on refresh)
 const defaultCameraFocus: FocusPosition = {
-  position: [0, 40, 170],
+  position: [0, 50, 200],
   lookAt: [0, 0, 0],
 };
 
@@ -142,6 +149,11 @@ const CameraScroller: React.FC = () => {
 
 export default CameraScroller;
 
+
+
+
+// old one
+// const handleScroll = (e: WheelEvent) => {
 //   if (isAnimating.current) return;
 
 //   const direction = e.deltaY > 0 ? 1 : -1;

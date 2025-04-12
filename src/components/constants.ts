@@ -1,34 +1,54 @@
 
 // ground details
-export const plotWidth = 200;
-export const plotDepth = 250;
+export const ground = {
+    width: 200,
+    depth: 250,
+};
 
 // wall details
-export const wallThickness = 1;
-export const wallHeight = 5;
-export const frontSpace = 60;
-export const enclosedDepth = plotDepth - frontSpace;
+export const groundWall = {
+    thickness : 1,
+    height:5,
+    frontSpace:60,
+    get enclosedDepth(){
+        return ground.depth - this.frontSpace
+    },
+    get frontWallWidth() {
+        return (ground.width - boundaryGate.width * 2) / 2;
+      },
+      get frontWallPosition() {
+        return this.frontWallWidth / 2 + boundaryGate.width;
+      } 
+}
 
 
 // gate details
-export const gateWidth = 10;
-export const gateThickness = 1;
-export const gateOpenAngle = Math.PI / 2; // 90 degrees
-export const gatePosition = plotDepth / 2 - frontSpace
+export const boundaryGate = {
+    width : 10,
+    thickness:1,
+    angle : Math.PI /2, // 90 degree
+    position : ground.depth / 2 - groundWall.frontSpace
+}
 
 
 // hut details
-export const hutWidth = 30;
-export const hutDepth = 30;
-export const hutHeight = 15;
-export const roofHeight = 10;
-export const hutOffsetX = plotWidth / 3.5;
-export const hutOffsetZ = plotDepth / 3;
+export const hut = {
+    width: 30,
+    depth:30,
+    height:15,
+    roofHeight:10,
+    offsetX:ground.width / 3.5,
+    offsetZ:ground.depth / 3,
+    wallThickness: 0.5,
+    wallHeight:5,
+    doorWidth:6,
+    doorHeight:10,
+}
+// hut position (typescript)
+export const hutPositions: [number, number, number][] = [
+    [-hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
+    [hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
+    [-hut.offsetX, 0, -hut.offsetZ],
+    [hut.offsetX, 0, -hut.offsetZ ],
+];
 
-// hut walls
-export const hutWallThickness = 0.5;
-export const hutWallHeight = 5;
-
-// hut doors
-export const doorWidth = 6;
-export const doorHeight = 10;
