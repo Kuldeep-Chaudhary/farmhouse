@@ -37,6 +37,17 @@ export const hut = {
 };
 
 export const hutPositions: [number, number, number][] = [
+  [0, 40, 170],
+  [0,20,150],
+  [0,20,100],
+  [0,20,70],
+  [-hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
+  [hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
+  [-hut.offsetX, 0, -hut.offsetZ],
+  [hut.offsetX, 0, -hut.offsetZ],
+];
+export const hutLookAtPositions: [number, number, number][] = [
+  [0,0,0],
   [-hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
   [hut.offsetX, 0, hut.offsetZ - hut.offsetZ / 1.2],
   [-hut.offsetX, 0, -hut.offsetZ],

@@ -1,194 +1,104 @@
 import { useEffect, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
-import { PerspectiveCamera, Vector3 } from "three";
-import gsap from "gsap";
+import { Vector3 } from "three";
 import GUI from "lil-gui";
-import { hutPositions } from "../constants";
+import { hutCameraPositions, hutLookAtPositions } from "../constants";
 
+// Helper functions
+const lerpArray = (a: number[], b: number[], t: number) =>
+  a.map((val, i) => val + (b[i] - val) * t);
 
-// Camera focus positions (position + lookAt)
-interface FocusPosition {
-  position: [number, number, number];
-  lookAt: [number, number, number];
-}
-
-const hutFocusPositions: FocusPosition[] = hutPositions.map(([x, y, z]) => ({
-  position: [x, y + 10, z + 40],
-  lookAt: [x, y, z],
-}));
-
-// Default camera view (like on refresh)
-const defaultCameraFocus: FocusPosition = {
-  position: [0, 40, 170],
-  lookAt: [0, 0, 0],
-};
+const clamp = (val: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, val));
 
 const CameraScroller: React.FC = () => {
-
-  
   const { camera } = useThree();
-  const currentIndex = useRef(-1); // Default index
-  const isAnimating = useRef(false);
+  const scrollProgress = useRef(0);
+  const targetPosition = useRef(new Vector3());
+  const targetLookAt = useRef(new Vector3());
   const gui = useRef<GUI | null>(null);
+  const currentPos = useRef(new Vector3());
+  const currentLookAt = useRef(new Vector3());
+  // 👇 Add isPanning flag to track panning state
+  const isPanning = useRef(false);
 
-  const lookAtRef = useRef({ x: 0, y: 0, z: 0 });
+  const totalPoints = hutCameraPositions.length;
+  const sensitivity = 0.0015;
 
   useEffect(() => {
-    const perspectiveCamera = camera as PerspectiveCamera;
+    // Initialize camera
+    camera.position.set(...hutCameraPositions[0]);
+    currentPos.current.copy(camera.position);
+    currentLookAt.current.set(...hutLookAtPositions[0]);
+    targetLookAt.current.copy(currentLookAt.current);
 
-    // Set initial camera position and lookAt (refresh)
-    camera.position.set(
-      defaultCameraFocus.position[0],
-      defaultCameraFocus.position[1],
-      defaultCameraFocus.position[2]
-    );
-    lookAtRef.current = {
-      x: defaultCameraFocus.lookAt[0],
-      y: defaultCameraFocus.lookAt[1],
-      z: defaultCameraFocus.lookAt[2],
-    };
-
-    // 🛠️ GUI setup
+    // Setup GUI for debugging
     gui.current = new GUI();
     const folder = gui.current.addFolder("Camera LookAt");
-    folder.add(lookAtRef.current, "x", -200, 200).listen();
-    folder.add(lookAtRef.current, "y", -200, 200).listen();
-    folder.add(lookAtRef.current, "z", -200, 200).listen();
+    folder.add(targetLookAt.current, "x", -200, 200).listen();
+    folder.add(targetLookAt.current, "y", -200, 200).listen();
+    folder.add(targetLookAt.current, "z", -200, 200).listen();
     folder.open();
+
+    // Scroll handler
     const handleScroll = (e: WheelEvent) => {
-      if (isAnimating.current) return;
-    
-      const direction = e.deltaY > 0 ? 1 : -1;
-      const newIndex = currentIndex.current + direction;
-    
-      // ✅ Allow up to one step beyond last hut index
-      if (newIndex < -1 || newIndex > hutFocusPositions.length) return;
-    
-      // ✅ Select correct target
-      let targetPos: [number, number, number];
-      let targetLookAt: [number, number, number];
-    
-      if (newIndex === -1 || newIndex === hutFocusPositions.length) {
-        targetPos = defaultCameraFocus.position;
-        targetLookAt = defaultCameraFocus.lookAt;
-      } else {
-        targetPos = hutFocusPositions[newIndex].position;
-        targetLookAt = hutFocusPositions[newIndex].lookAt;
+      scrollProgress.current += e.deltaY * sensitivity;
+
+      // Loop-back logic
+      if (scrollProgress.current >= totalPoints - 1) {
+        scrollProgress.current = 0;
       }
-    
-      const currentPos = camera.position.clone();
-    
-      // Calculate current lookAt from camera direction
-      const dir = new Vector3();
-      camera.getWorldDirection(dir);
-      const currentLookAt = currentPos.clone().add(dir.multiplyScalar(100));
-    
-      // Dummy object for GSAP animation
-      const dummy = {
-        posX: currentPos.x,
-        posY: currentPos.y,
-        posZ: currentPos.z,
-        lookX: currentLookAt.x,
-        lookY: currentLookAt.y,
-        lookZ: currentLookAt.z,
-      };
-    
-      isAnimating.current = true;
-    
-      gsap.to(dummy, {
-        posX: targetPos[0],
-        posY: targetPos[1],
-        posZ: targetPos[2],
-        lookX: targetLookAt[0],
-        lookY: targetLookAt[1],
-        lookZ: targetLookAt[2],
-        duration: 1.2,
-        ease: "power2.inOut",
-        onUpdate: () => {
-          camera.position.set(dummy.posX, dummy.posY, dummy.posZ);
-          lookAtRef.current.x = dummy.lookX;
-          lookAtRef.current.y = dummy.lookY;
-          lookAtRef.current.z = dummy.lookZ;
-        },
-        onComplete: () => {
-          isAnimating.current = false;
-    
-          // ✅ Reset to default index if we go beyond last hut
-          currentIndex.current =
-            newIndex === hutFocusPositions.length ? -1 : newIndex;
-        },
-      });
+
+      scrollProgress.current = clamp(scrollProgress.current, 0, totalPoints - 1);
+    };
+
+    // 👇 Add mouse event listeners for panning
+    const handleMouseDown = () => {
+      isPanning.current = true;
+    };
+
+    const handleMouseUp = () => {
+      isPanning.current = false;
     };
 
     window.addEventListener("wheel", handleScroll, { passive: true });
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
 
+    // Cleanup
     return () => {
       window.removeEventListener("wheel", handleScroll);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
       gui.current?.destroy();
     };
   }, [camera]);
 
-  // Constantly update lookAt target
   useFrame(() => {
-    camera.lookAt(
-      lookAtRef.current.x,
-      lookAtRef.current.y,
-      lookAtRef.current.z
-    );
+    // 👇 Skip camera updates if panning
+    if (isPanning.current) return;
+
+    const progress = scrollProgress.current;
+    const index = Math.floor(progress);
+    const t = progress - index;
+
+    if (index >= totalPoints - 1) return;
+
+    const posArr = lerpArray(hutCameraPositions[index], hutCameraPositions[index + 1], t);
+    const lookArr = lerpArray(hutLookAtPositions[index], hutLookAtPositions[index + 1], t);
+
+    targetPosition.current.set(...posArr);
+    targetLookAt.current.set(...lookArr);
+
+    // Lerp camera position and lookAt smoothly
+    currentPos.current.lerp(targetPosition.current, 0.1);
+    currentLookAt.current.lerp(targetLookAt.current, 0.1);
+
+    camera.position.copy(currentPos.current);
+    camera.lookAt(currentLookAt.current);
   });
 
   return null;
 };
 
 export default CameraScroller;
-
-//   if (isAnimating.current) return;
-
-//   const direction = e.deltaY > 0 ? 1 : -1;
-//   const newIndex = currentIndex.current + direction;
-
-//   if (newIndex < -1 || newIndex >= hutFocusPositions.length) return;
-
-//   const { position: targetPos, lookAt: targetLookAt } =
-//     newIndex === -1 ? defaultCameraFocus : hutFocusPositions[newIndex];
-
-//   const currentPos = camera.position.clone();
-
-//   // Calculate current lookAt from camera direction
-//   const dir = new Vector3();
-//   camera.getWorldDirection(dir);
-//   const currentLookAt = currentPos.clone().add(dir.multiplyScalar(100));
-
-//   // Dummy object for GSAP animation
-//   const dummy = {
-//     posX: currentPos.x,
-//     posY: currentPos.y,
-//     posZ: currentPos.z,
-//     lookX: currentLookAt.x,
-//     lookY: currentLookAt.y,
-//     lookZ: currentLookAt.z,
-//   };
-
-//   isAnimating.current = true;
-
-//   gsap.to(dummy, {
-//     posX: targetPos[0],
-//     posY: targetPos[1],
-//     posZ: targetPos[2],
-//     lookX: targetLookAt[0],
-//     lookY: targetLookAt[1],
-//     lookZ: targetLookAt[2],
-//     duration: 1.2,
-//     ease: "power2.inOut",
-//     onUpdate: () => {
-//       camera.position.set(dummy.posX, dummy.posY, dummy.posZ);
-//       lookAtRef.current.x = dummy.lookX;
-//       lookAtRef.current.y = dummy.lookY;
-//       lookAtRef.current.z = dummy.lookZ;
-//     },
-//     onComplete: () => {
-//       isAnimating.current = false;
-//       currentIndex.current = newIndex;
-//     },
-//   });
-// };
