@@ -10,6 +10,7 @@ import TitleBoard from "../components/elements/TitleBoard";
 import CameraScroller from "../components/fov/CameraScroller";
 import Rain from "../components/nature/Rain";
 import SmoothSky from "../components/nature/SmoothSky";
+import WaterPlane from "../components/nature/WaterPlane";
 
 const Home: React.FC = () => {
   const [isRaining, setIsRaining] = useState(false);
@@ -52,12 +53,13 @@ const Home: React.FC = () => {
         style={{ width: "100%", height: "100%", background: backgroundColor }}
         camera={{ position: [0, 40, 160], fov: 75 }}
       >
-        <CameraScroller />
+        {/* <CameraScroller /> */}
         <Sky sunPosition={skySunPosition} turbidity={8} />
         {/* <SmoothSky targetPosition={skySunPosition} turbidity={8} /> */}
 
 
         <Rain isActive={isRaining} />
+        <WaterPlane  position={[0, 30, 70]}/>
 
         {/* 💡 Lights */}
         <ambientLight intensity={isNight ? 0.3 : 1} />
@@ -75,7 +77,7 @@ const Home: React.FC = () => {
         ))}
 
         <OrbitControls
-          enableZoom={false}
+          enableZoom
           enablePan={true}
           enableRotate
           minPolarAngle={Math.PI / 6}
