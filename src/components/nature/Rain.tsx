@@ -9,7 +9,7 @@ interface RainProps {
 
 const Rain: React.FC<RainProps> = ({ isActive }) => {
   const rainRef = useRef<THREE.Points>(null);
-  const [intensity, setIntensity] = useState(10000);
+  const [intensity, setIntensity] = useState(100000);
   const [speed, setSpeed] = useState(1);
   const [gui, setGui] = useState<GUI | null>(null);
 
@@ -17,7 +17,7 @@ const Rain: React.FC<RainProps> = ({ isActive }) => {
   useEffect(() => {
     if (isActive && !gui) {
       const newGui = new GUI();
-      newGui.add({ intensity }, "intensity", 100, 100000, 100)
+      newGui.add({ intensity }, "intensity", 100, 1000000, 100)
         .onChange((val) => setIntensity(val))
         .name("Rain Intensity");
 
@@ -39,9 +39,9 @@ const Rain: React.FC<RainProps> = ({ isActive }) => {
     const positions = new Float32Array(intensity * 3);
 
     for (let i = 0; i < intensity; i++) {
-      positions[i * 3 + 0] = Math.random() * 200 - 100;
+      positions[i * 3 + 0] = Math.random() * 400 - 200;
       positions[i * 3 + 1] = Math.random() * 200;
-      positions[i * 3 + 2] = Math.random() * 200 - 100;
+      positions[i * 3 + 2] = Math.random() * 400 - 200;
     }
 
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));

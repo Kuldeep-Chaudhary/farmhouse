@@ -1,0 +1,8 @@
+Model Information:
+* title:	Tree 3d model Fir Spruce Pine
+* source:	https://sketchfab.com/3d-models/tree-3d-model-fir-spruce-pine-d774856e77f24daa852187d701a528f7
+* author:	Qruad (https://sketchfab.com/epic.gamez1204)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

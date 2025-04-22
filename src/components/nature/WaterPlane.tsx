@@ -1,48 +1,51 @@
-import { MeshDistortMaterial } from "@react-three/drei";
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import * as THREE from 'three';
+import { useRef, useEffect } from 'react';
+import { useFrame, useLoader } from '@react-three/fiber';
+import { Water } from 'three-stdlib';
+import { ground } from '../../config';
 
-// components/nature/WaterPlane.tsx
-const WaterPlane = ({ position = [0, 0, 0] }) => {
-  const meshRef = useRef<any>();
+export const WaterPlane: React.FC = () => {
+  const waterRef = useRef<THREE.Group>(null);
 
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      // Add more complex wave movement using sin/cos and time-based offsets
-      const time = clock.getElapsedTime();
-      meshRef.current.rotation.z = Math.sin(time * 0.1) * 0.05;
+  const waterNormals = useLoader(THREE.TextureLoader, '/texture/water/waternormals.jpg');
 
-      // Here we will modify the displacement of vertices to simulate waves
-      const vertices = meshRef.current.geometry.attributes.position.array;
-      const amplitude = 0.5; // wave height
-      const frequency = 2; // wave speed
+  useEffect(() => {
+    waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
-      for (let i = 0; i < vertices.length; i += 3) {
-        const x = vertices[i];
-        const y = vertices[i + 1];
+    const waterGeometry = new THREE.PlaneGeometry(ground.width, ground.depth);
 
-        // Apply both sine and cosine to make the waves look more realistic
-        vertices[i + 2] = Math.sin(x * frequency + time) * amplitude + Math.cos(y * frequency + time) * amplitude;
-      }
-      meshRef.current.geometry.attributes.position.needsUpdate = true; // Update the geometry
+    const water = new Water(waterGeometry, {
+      textureWidth: 1024,
+      textureHeight: 1024,
+      waterNormals,
+      sunDirection: new THREE.Vector3(1, 1, 1).normalize(),
+      sunColor: 0xffffff,
+      waterColor: 0x1f1f1f,
+      distortionScale: 0.1,
+      fog: false,
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+    });
+
+    water.rotation.x = -Math.PI / 2;
+    water.position.y = 0.14;
+    water.renderOrder = 1;
+
+    if (waterRef.current) {
+      waterRef.current.clear();
+      waterRef.current.add(water);
+    }
+
+  }, [waterNormals]);
+
+  // Animate the water by updating its shader time uniform
+  useFrame((_, delta) => {
+    const water = waterRef.current?.children[0] as any;
+    if (water?.material?.uniforms?.time) {
+      water.material.uniforms.time.value += delta;
     }
   });
 
-  return (
-    <mesh ref={meshRef} position={position}>
-      <planeGeometry rotation={[-Math.PI / 8, 0, 0]} args={[50, 50, 256, 256]} />
-
-      <MeshDistortMaterial
-        color="#4da6ff"
-        distort={0.5}  // increase the distortion for more visible waves
-        speed={2}      // speed of the wave motion
-        roughness={0.1} // lower roughness to make it smoother (less matte)
-        transparent={true} // make it semi-transparent for a water effect
-        opacity={0.8} // adjust opacity for a more realistic water look
-      />
-    </mesh>
-  );
+  return <group ref={waterRef} />;
 };
-
-export default WaterPlane;

@@ -1,40 +1,59 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLoader } from "@react-three/fiber";
 import { RepeatWrapping, TextureLoader } from "three";
 import { ground } from "../config";
-import colorGroundImg from '../assets/textures/ground/pavement_03_diff_1k.jpg'
-import armGroundImg from '../assets/textures/ground/pavement_03_arm_1k.jpg'
-import normalGroundImg from '../assets/textures/ground/pavement_03_nor_gl_1k.jpg'
-import dispGroundImg from '../assets/textures/ground/pavement_03_disp_1k.jpg'
+import colorGroundImg from "../assets/textures/ground/pavement_03_diff_1k.jpg";
+import armGroundImg from "../assets/textures/ground/pavement_03_arm_1k.jpg";
+import normalGroundImg from "../assets/textures/ground/pavement_03_nor_gl_1k.jpg";
 
 const Ground: React.FC = () => {
-  const colorTexture = useLoader(TextureLoader, colorGroundImg); 
-  const armTexture = useLoader(TextureLoader, armGroundImg); 
-  const normalTexture = useLoader(TextureLoader, normalGroundImg); 
-  const dispTexture = useLoader(TextureLoader, dispGroundImg); 
+  const ref = useRef<THREE.Mesh>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(()=>{
-    if(colorTexture){
-      colorTexture.wrapS = RepeatWrapping
-      colorTexture.wrapT = RepeatWrapping
-      armTexture.wrapS = RepeatWrapping
-      armTexture.wrapT = RepeatWrapping
-      normalTexture.wrapS = RepeatWrapping
-      normalTexture.wrapT = RepeatWrapping
-      dispTexture.wrapS = RepeatWrapping
-      dispTexture.wrapT = RepeatWrapping
+  const colorTexture = useLoader(TextureLoader, colorGroundImg);
+  const armTexture = useLoader(TextureLoader, armGroundImg);
+  const normalTexture = useLoader(TextureLoader, normalGroundImg);
 
-      colorTexture.repeat.set(4,4)
-      armTexture.repeat.set(4,4)
-      normalTexture.repeat.set(4,4)
-      dispTexture.repeat.set(4,4)
+  useEffect(() => {
+    [colorTexture, armTexture, normalTexture].forEach((texture) => {
+      texture.wrapS = RepeatWrapping;
+      texture.wrapT = RepeatWrapping;
+      texture.repeat.set(4, 4);
+      texture.anisotropy = 16;
+    });
+
+    // Wait until all textures are loaded
+    if (colorTexture && armTexture && normalTexture) {
+      setIsLoaded(true);
     }
-  },[colorTexture, normalTexture, armTexture])
+
+    if (ref.current) {
+      const geometry = ref.current.geometry;
+      if (!geometry.attributes.uv2) {
+        geometry.setAttribute('uv2', geometry.attributes.uv.clone());
+      }
+    }
+  }, [colorTexture, armTexture, normalTexture]);
+
+  if (!isLoaded) {
+    return null; // Or return a loading spinner if needed
+  }
 
   return (
-    <mesh position={ground.position} rotation={ground.rotation} castShadow receiveShadow>
+    <mesh
+      ref={ref}
+      position={ground.position}
+      rotation={ground.rotation}
+      castShadow
+      receiveShadow
+      renderOrder={0}
+    >
       <planeGeometry args={[ground.width, ground.depth]} />
-      <meshStandardMaterial map={colorTexture} aoMap={armTexture} normalMap={normalTexture} displacementMap={dispTexture} />
+      <meshStandardMaterial
+        map={colorTexture}
+        normalMap={normalTexture}
+        aoMap={armTexture}
+      />
     </mesh>
   );
 };
