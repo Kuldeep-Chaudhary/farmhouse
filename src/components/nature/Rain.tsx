@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useMemo, useState } from "react";
+import React, { useRef, useMemo, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import GUI from "lil-gui";
 
 interface RainProps {
   isActive: boolean;
@@ -9,30 +8,8 @@ interface RainProps {
 
 const Rain: React.FC<RainProps> = ({ isActive }) => {
   const rainRef = useRef<THREE.Points>(null);
-  const [intensity, setIntensity] = useState(100000);
-  const [speed, setSpeed] = useState(1);
-  const [gui, setGui] = useState<GUI | null>(null);
-
-  // GUI setup
-  useEffect(() => {
-    if (isActive && !gui) {
-      const newGui = new GUI();
-      newGui.add({ intensity }, "intensity", 100, 1000000, 100)
-        .onChange((val) => setIntensity(val))
-        .name("Rain Intensity");
-
-      newGui.add({ speed }, "speed", 0.1, 5, 0.1)
-        .onChange((val) => setSpeed(val))
-        .name("Rain Speed");
-
-      setGui(newGui);
-    }
-
-    if (!isActive && gui) {
-      gui.destroy();
-      setGui(null);
-    }
-  }, [isActive]);
+  const [intensity] = useState(100000); // Static intensity
+  const [speed] = useState(1); // Static speed
 
   const rainGeometry = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
@@ -49,16 +26,16 @@ const Rain: React.FC<RainProps> = ({ isActive }) => {
   }, [intensity]);
 
   useFrame(() => {
-    if (!isActive) return;
+    if (!isActive || !rainRef.current) return;
 
-    const positions = rainRef.current?.geometry.attributes.position;
-    if (!positions) return;
+    const positions = rainRef.current.geometry.attributes.position as THREE.BufferAttribute;
 
     for (let i = 0; i < positions.count; i++) {
       let y = positions.getY(i) - speed;
       if (y < 0) y = 200;
       positions.setY(i, y);
     }
+
     positions.needsUpdate = true;
   });
 

@@ -13,11 +13,16 @@ import SmoothSky from "../components/nature/SmoothSky";
 import {WaterPlane} from "../components/nature/WaterPlane";
 import Tree from "../components/tree/Tree";
 import { titleBoard } from "../config";
+import HailStones from "../components/physics/HailStones";
+import { Physics } from "@react-three/cannon";
+import PhysicsGround from "../components/physics/PhysicsGround";
+import InfiniteGround from "../components/InfiniteGround";
 
 const Home: React.FC = () => {
   const [isRaining, setIsRaining] = useState(false);
   const [isNight, setIsNight] = useState(false); // 🌙 Night toggle
   const [isStorm, setIsStorm] = useState(false); // 🌪️ Storm state
+  const [isHailstoneActive, setIsHailstoneActive] = useState(false);
 
 
   const skySunPosition = isNight ? [100, -5, 100] : [100, 10, -300];
@@ -62,6 +67,17 @@ const Home: React.FC = () => {
         >
           {isNight ? "🌞 Day" : "🌙 Night"}
         </button>
+            {/* Button outside the Canvas */}
+      <button
+          onClick={() => setIsHailstoneActive((prev) => !prev)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}>
+        Add Hailstone
+      </button>
       </div>
 
       {/* 🎨 Canvas */}
@@ -78,6 +94,8 @@ const Home: React.FC = () => {
           mieDirectionalG={isNight ? 0 : 0.8}
         />
         {/* <SmoothSky targetPosition={skySunPosition} turbidity={8} /> */}
+        
+        <Physics gravity={[0, -9.82, 0]} fixedTimeStep={1 / 60} maxSubSteps={10}> 
 
         <Rain isActive={isRaining} />
         <WaterPlane />
@@ -89,12 +107,7 @@ const Home: React.FC = () => {
           intensity={isNight ? 0.1 : 1.5}
         />
 
-        {/* 🏗️ Scene */}
-        <group rotation={[0, Math.PI, 0]}>
-          <BoundaryWalls />
-          <Ground />
-          <Gate />
-        </group>
+      
         <TitleBoard />
         {hutPositions.map((pos, index) => (
           <Hut key={index} position={pos} />
@@ -103,6 +116,16 @@ const Home: React.FC = () => {
         <Tree key="tree1" position={[-80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
         <Tree key="tree2" position={[80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
 
+            {/* 🏗️ Scene */}
+        <group rotation={[0, Math.PI, 0]}>
+          <BoundaryWalls />
+          <Ground />
+          {/* <InfiniteGround/> */}
+          <Gate />
+        </group>
+        <HailStones isActive={isHailstoneActive}/>
+        </Physics>
+        
         <OrbitControls
           enableZoom
           enablePan={true}

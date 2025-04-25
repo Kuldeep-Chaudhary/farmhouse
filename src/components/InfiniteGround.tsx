@@ -7,7 +7,7 @@ import armGroundImg from "../assets/textures/ground/pavement_03_arm_1k.jpg";
 import normalGroundImg from "../assets/textures/ground/pavement_03_nor_gl_1k.jpg";
 import { usePlane } from "@react-three/cannon";
 
-const Ground: React.FC = () => {
+const InfiniteGround: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null); // Ref for the mesh
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -36,16 +36,7 @@ const Ground: React.FC = () => {
     }
   }, [colorTexture, armTexture, normalTexture]);
 
-  const [ref] = usePlane(() => ({
-    rotation: [-Math.PI / 2, 0, 0],
-    position: [0, 0, 0],
-    material: {
-      restitution: 1.0, 
-      friction: 0.4,
-    },
-    mass: 0,
-    args: [ground.width, ground.depth],
-  }));
+
 
   if (!isLoaded) {
     return null;
@@ -53,14 +44,13 @@ const Ground: React.FC = () => {
 
   return (
     <mesh
-      ref={ref}
       position={ground.position}
       rotation={ground.rotation}
       castShadow
       receiveShadow
       renderOrder={0}
     >
-      <planeGeometry args={[ground.width, ground.depth]} />
+      <planeGeometry args={[2000, 2000]} />
       <meshStandardMaterial
         map={colorTexture}
         normalMap={normalTexture}
@@ -70,4 +60,4 @@ const Ground: React.FC = () => {
   );
 };
 
-export default Ground;
+export default InfiniteGround;

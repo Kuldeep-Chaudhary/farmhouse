@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
+import { useBox } from "@react-three/cannon";
 
 // Default textures
 import wallTextureImg from "../../assets/textures/wall/plaster_brick_pattern_diff_1k.jpg";
@@ -24,7 +25,7 @@ const Wall: React.FC<WallProps> = ({
   map,
   aoMap,
   normalMap,
-  repeatScale = [1,1],
+  repeatScale = [1, 1],
 }) => {
   const loadedMap = useLoader(THREE.TextureLoader, map || wallTextureImg);
   const loadedAoMap = useLoader(THREE.TextureLoader, aoMap || wallArmTextureImg);
@@ -34,14 +35,41 @@ const Wall: React.FC<WallProps> = ({
     [loadedMap, loadedAoMap, loadedNormalMap].forEach((tex) => {
       tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       tex.repeat.set(repeatScale[0], repeatScale[1]);
-      tex.anisotropy = 16; // Improves texture clarity at angles
+      tex.anisotropy = 16;
       tex.needsUpdate = true;
     });
   }, [loadedMap, loadedAoMap, loadedNormalMap, repeatScale]);
 
+  const geometryRef = useRef<THREE.BufferGeometry>(null!);
+
+  // Sync UV2 for aoMap
+  useEffect(() => {
+    if (geometryRef.current && geometryRef.current.attributes.uv) {
+      geometryRef.current.setAttribute(
+        "uv2",
+        new THREE.BufferAttribute(
+          geometryRef.current.attributes.uv.array,
+          2
+        )
+      );
+    }
+  }, []);
+
+  const [ref] = useBox(() => ({
+    position,
+    rotation,
+    args: size,
+    type: "Static",
+    material: {
+      friction: 0.8,
+      restitution: 0.1,
+    },
+    mass:0
+  }));
+
   return (
-    <mesh position={position} rotation={rotation} castShadow receiveShadow>
-      <boxGeometry args={size} />
+    <mesh ref={ref} castShadow receiveShadow>
+      <boxGeometry args={size} ref={geometryRef} />
       <meshStandardMaterial
         map={loadedMap}
         aoMap={loadedAoMap}
