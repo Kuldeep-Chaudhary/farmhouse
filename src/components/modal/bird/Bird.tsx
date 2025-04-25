@@ -13,7 +13,7 @@ const Bird = ({ isActive }: BirdProps) => {
   const { actions, names } = useAnimations(animations, birdRef)
 
   const radius = 150
-  const speed = 0.05
+  const speed = 0.01
   const angleRef = useRef(0)
   const height = 200
 
