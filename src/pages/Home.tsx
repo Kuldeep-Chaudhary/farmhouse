@@ -17,12 +17,14 @@ import HailStones from "../components/physics/HailStones";
 import { Physics } from "@react-three/cannon";
 import PhysicsGround from "../components/physics/PhysicsGround";
 import InfiniteGround from "../components/InfiniteGround";
+import Bird from "../components/modal/bird/Bird";
 
 const Home: React.FC = () => {
   const [isRaining, setIsRaining] = useState(false);
   const [isNight, setIsNight] = useState(false); // 🌙 Night toggle
   const [isStorm, setIsStorm] = useState(false); // 🌪️ Storm state
   const [isHailstoneActive, setIsHailstoneActive] = useState(false);
+  const [Phoenix,setPhoenix] = useState(false)
 
 
   const skySunPosition = isNight ? [100, -5, 100] : [100, 10, -300];
@@ -53,7 +55,7 @@ const Home: React.FC = () => {
             setIsStorm((prev) => !prev);
           }}
         >
-          {isRaining ? "☀️ Stop Rain" : "🌧️ Start Rain"}
+          {isRaining ? "☀️" : "🌧️ "}
         </button>
 
         <button
@@ -65,9 +67,9 @@ const Home: React.FC = () => {
           }}
           onClick={() => setIsNight((prev) => !prev)}
         >
-          {isNight ? "🌞 Day" : "🌙 Night"}
+          {isNight ? "🌞 " : "🌙 "}
         </button>
-            {/* Button outside the Canvas */}
+            
       <button
           onClick={() => setIsHailstoneActive((prev) => !prev)}
           style={{
@@ -76,7 +78,16 @@ const Home: React.FC = () => {
             borderRadius: "10px",
             cursor: "pointer",
           }}>
-        Add Hailstone
+        ⚪
+      </button>    <button
+          onClick={() => setPhoenix((prev) => !prev)}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}>
+        🐦
       </button>
       </div>
 
@@ -115,6 +126,7 @@ const Home: React.FC = () => {
         {/* trees  */}
         <Tree key="tree1" position={[-80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
         <Tree key="tree2" position={[80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
+        <Bird isActive={Phoenix} targetPosition={{ x: -80, y: -1, z: titleBoard.groupPosition[2] }} />
 
             {/* 🏗️ Scene */}
         <group rotation={[0, Math.PI, 0]}>
