@@ -10,7 +10,7 @@ import TitleBoard from "../components/elements/TitleBoard";
 import CameraScroller from "../components/fov/CameraScroller";
 import Rain from "../components/nature/Rain";
 import SmoothSky from "../components/nature/SmoothSky";
-import {WaterPlane} from "../components/nature/WaterPlane";
+import { WaterPlane } from "../components/nature/WaterPlane";
 import Tree from "../components/tree/Tree";
 import { titleBoard } from "../config";
 import HailStones from "../components/physics/HailStones";
@@ -24,11 +24,38 @@ const Home: React.FC = () => {
   const [isNight, setIsNight] = useState(false); // 🌙 Night toggle
   const [isStorm, setIsStorm] = useState(false); // 🌪️ Storm state
   const [isHailstoneActive, setIsHailstoneActive] = useState(false);
-  const [Phoenix,setPhoenix] = useState(false)
-
+  const [Phoenix, setPhoenix] = useState(false);
 
   const skySunPosition = isNight ? [100, -5, 100] : [100, 10, -300];
   const backgroundColor = isNight ? "#0a0a1a" : "skyblue"; // optional bg color change
+
+  const buttons = [
+    {
+      icon1: "☀️",
+      icon2: "🌧️",
+      getValue: () => isRaining,
+      toggle: () => {
+        setIsRaining((prev) => !prev);
+        setIsStorm((prev) => !prev);
+      },
+    },
+    {
+      icon1: "🌞",
+      icon2: "🌙",
+      getValue: () => isNight,
+      toggle: () => setIsNight((prev) => !prev),
+    },
+    {
+      icon1: "⚪",
+      getValue: () => isHailstoneActive,
+      toggle: () => setIsHailstoneActive((prev) => !prev),
+    },
+    {
+      icon1: "🐦",
+      getValue: () => Phoenix,
+      toggle: () => setPhoenix((prev) => !prev),
+    },
+  ];
 
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
@@ -43,52 +70,20 @@ const Home: React.FC = () => {
           gap: "10px",
         }}
       >
-        <button
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "10px",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            setIsRaining((prev) => !prev);
-            setIsStorm((prev) => !prev);
-          }}
-        >
-          {isRaining ? "☀️" : "🌧️ "}
-        </button>
-
-        <button
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "10px",
-            cursor: "pointer",
-          }}
-          onClick={() => setIsNight((prev) => !prev)}
-        >
-          {isNight ? "🌞 " : "🌙 "}
-        </button>
-            
-      <button
-          onClick={() => setIsHailstoneActive((prev) => !prev)}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "10px",
-            cursor: "pointer",
-          }}>
-        ⚪
-      </button>    <button
-          onClick={() => setPhoenix((prev) => !prev)}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            borderRadius: "10px",
-            cursor: "pointer",
-          }}>
-        🐦
-      </button>
+        {buttons.map((btn, index) => (
+          <button
+            key={index}
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              borderRadius: "10px",
+              cursor: "pointer",
+            }}
+            onClick={btn.toggle}
+          >
+            {btn.icon2 ? (btn.getValue() ? btn.icon1 : btn.icon2) : btn.icon1}
+          </button>
+        ))}
       </div>
 
       {/* 🎨 Canvas */}
@@ -105,39 +100,52 @@ const Home: React.FC = () => {
           mieDirectionalG={isNight ? 0 : 0.8}
         />
         {/* <SmoothSky targetPosition={skySunPosition} turbidity={8} /> */}
-        
-        <Physics gravity={[0, -9.82, 0]} fixedTimeStep={1 / 60} maxSubSteps={10}> 
 
-        <Rain isActive={isRaining} />
-        <WaterPlane />
+        <Physics
+          gravity={[0, -9.82, 0]}
+          fixedTimeStep={1 / 60}
+          maxSubSteps={10}
+        >
+          <Rain isActive={isRaining} />
+          <WaterPlane />
 
-        {/* 💡 Lights */}
-        <ambientLight intensity={isNight ? 0.3 : 1} />
-        <directionalLight
-          position={[10, 10, 10]}
-          intensity={isNight ? 0.1 : 1.5}
-        />
+          {/* 💡 Lights */}
+          <ambientLight intensity={isNight ? 0.3 : 1} />
+          <directionalLight
+            position={[10, 10, 10]}
+            intensity={isNight ? 0.1 : 1.5}
+          />
 
-      
-        <TitleBoard />
-        {hutPositions.map((pos, index) => (
-          <Hut key={index} position={pos} />
-        ))}
-        {/* trees  */}
-        <Tree key="tree1" position={[-80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
-        <Tree key="tree2" position={[80, -1, titleBoard.groupPosition[2]]} isStorm={isStorm}/>
-        <Bird isActive={Phoenix} targetPosition={{ x: -80, y: -1, z: titleBoard.groupPosition[2] }} />
+          <TitleBoard />
+          {hutPositions.map((pos, index) => (
+            <Hut key={index} position={pos} />
+          ))}
+          {/* trees  */}
+          <Tree
+            key="tree1"
+            position={[-80, -1, titleBoard.groupPosition[2]]}
+            isStorm={isStorm}
+          />
+          <Tree
+            key="tree2"
+            position={[80, -1, titleBoard.groupPosition[2]]}
+            isStorm={isStorm}
+          />
+          <Bird
+            isActive={Phoenix}
+            targetPosition={{ x: -80, y: -1, z: titleBoard.groupPosition[2] }}
+          />
 
-            {/* 🏗️ Scene */}
-        <group rotation={[0, Math.PI, 0]}>
-          <BoundaryWalls />
-          <Ground />
-          {/* <InfiniteGround/> */}
-          <Gate />
-        </group>
-        <HailStones isActive={isHailstoneActive}/>
+          {/* 🏗️ Scene */}
+          <group rotation={[0, Math.PI, 0]}>
+            <BoundaryWalls />
+            <Ground />
+            {/* <InfiniteGround/> */}
+            <Gate />
+          </group>
+          <HailStones isActive={isHailstoneActive} />
         </Physics>
-        
+
         <OrbitControls
           enableZoom
           enablePan={true}

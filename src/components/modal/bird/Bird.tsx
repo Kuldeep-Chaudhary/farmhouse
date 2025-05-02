@@ -12,7 +12,10 @@ const Bird = ({ isActive }: BirdProps) => {
   const { scene, animations } = useGLTF('/modal/bird/bird.glb')
   const { actions, names } = useAnimations(animations, birdRef)
 
-  const radius = 150
+
+  console.log(animations,"animations");
+
+  const radius = 200
   const speed = 0.01
   const angleRef = useRef(0)
   const height = 200
