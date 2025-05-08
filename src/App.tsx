@@ -3,6 +3,7 @@ import { Route,  Routes } from 'react-router-dom'
 import Home from './pages/Home'
 import CatMovement from './pages/CatMovement'
 import EnvirmentMap from './pages/EnvirmentMap'
+import RealsticRender from './pages/RealsticRender'
 
 function App() {
 
@@ -11,7 +12,8 @@ function App() {
      <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/cat" element={<CatMovement />} />
-        <Route path='/' element={<EnvirmentMap/>}/>
+        <Route path='/environment' element={<EnvirmentMap/>}/>
+        <Route path='/' element={<RealsticRender/>}/>
       </Routes>
     </>
   )
