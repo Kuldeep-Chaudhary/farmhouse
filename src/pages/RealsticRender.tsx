@@ -3,21 +3,18 @@ import React, { Suspense } from 'react'
 import StarterPack from '../components/releasticrender/StarterPack'
 import { OrbitControls } from '@react-three/drei'
 import ModelLoader from '../components/modal/helmet/ModelLoader'
-import { EffectComposer, ToneMapping } from '@react-three/postprocessing';
-import { ToneMappingMode } from 'postprocessing'
-import PostProcessing from '../components/releasticrender/Postprocessing'
-import * as THREE from 'three';
+import PostProcessing from '../components/releasticrender/PostProcessing'
 
 const RealsticRender: React.FC = () => {
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
       <Canvas
         style={{ width: "100%", height: "100%" }}
-        camera={{ position: [0, 5, 20], fov: 75 }}
+        camera={{ position: [0, 15, 20], fov: 75 }}
       >
         {/* Lights */}
-        <ambientLight intensity={1} />
-        <directionalLight intensity={1.5} />
+        {/* <ambientLight intensity={1} /> */}
+        <directionalLight intensity={10} position={[10,2,2]} />
         <OrbitControls
           enableZoom
           enablePan
@@ -25,11 +22,7 @@ const RealsticRender: React.FC = () => {
           minPolarAngle={Math.PI / 6}
           maxPolarAngle={1.5}
         />
-
-        {/* Apply tone mapping to the whole scene */}
-        <EffectComposer>
-          <ToneMapping mode={ToneMappingMode.REINHARD} />
-        </EffectComposer>
+        
 
         {/* Modal and map */}
         <Suspense fallback={null}>

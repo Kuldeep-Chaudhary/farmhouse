@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import CatMovement from './pages/CatMovement'
 import EnvirmentMap from './pages/EnvirmentMap'
 import RealsticRender from './pages/RealsticRender'
+import CustomFiber from './pages/CustomFiber'
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="/cat" element={<CatMovement />} />
         <Route path='/environment' element={<EnvirmentMap/>}/>
         <Route path='/' element={<RealsticRender/>}/>
+        <Route path='/fiber' element={<CustomFiber/>}/>
       </Routes>
     </>
   )

@@ -13,7 +13,7 @@ const TONE_MAPPING_MODES = {
 };
 
 const PostProcessing: React.FC = () => {
-  const [mode, setMode] = useState<ToneMappingMode>(ToneMappingMode.REINHARD);
+  // const [mode, setMode] = useState<ToneMappingMode>(ToneMappingMode.REINHARD);
 
   // useEffect(() => {
   //   const gui = new GUI();
@@ -30,7 +30,7 @@ const PostProcessing: React.FC = () => {
 
   return (
     <EffectComposer>
-      <ToneMapping mode={mode} />
+      <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
     </EffectComposer>
   );
 };
