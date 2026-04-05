@@ -1,0 +1,5 @@
+src/components/fov/CameraPath.tsx(23,11): error TS2322: Type '{ children: Element; geometry: BufferGeometry<NormalBufferAttributes>; }' is not assignable to type 'SVGLineElementAttributes<SVGLineElement>'.
+  Property 'geometry' does not exist on type 'SVGLineElementAttributes<SVGLineElement>'.
+src/components/fov/CameraScroller copy.tsx(6,10): error TS2305: Module '"../constants"' has no exported member 'hutOffsetX'.
+src/components/fov/CameraScroller copy.tsx(6,22): error TS2305: Module '"../constants"' has no exported member 'hutOffsetZ'.
+src/pages/EnvirmentMap.tsx(4,28): error TS2307: Cannot find module 'three/examples/jsm/loaders/RGBELoader' or its corresponding type declarations.

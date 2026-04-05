@@ -9,9 +9,9 @@ const SEGMENT_LENGTH = TOTAL_LENGTH / SEGMENTS;
 const FIXED_Z = -2;
 
 const Rope = () => {
-  const { camera, mouse } = useThree();
-  const curveRef = useRef();
-  const segmentRefs = useRef([]);
+  const { mouse } = useThree();
+  const curveRef = useRef<any>(null);
+  const segmentRefs = useRef<any[]>([]);
 
   // Top segment (kinematic)
   const [topRef, topApi] = useBox(() => ({
@@ -77,7 +77,7 @@ const Rope = () => {
     topApi.position.set(mouseWorld.x, mouseWorld.y, FIXED_Z);
 
     // Create spline points
-    const points = segmentBodies.map(([ref], i) =>
+    const points = segmentBodies.map((_, i) =>
       segmentRefs.current[i]?.position
         ? segmentRefs.current[i].position.clone()
         : new THREE.Vector3(0, 40 - (i + 1) * SEGMENT_LENGTH, FIXED_Z)
@@ -111,8 +111,8 @@ const Rope = () => {
         <boxGeometry args={[0.1, SEGMENT_LENGTH, 0.1]} />
         <meshStandardMaterial />
       </mesh>
-      {segmentBodies.map(([ref], i) => (
-        <mesh ref={(el) => (segmentRefs.current[i] = el)} key={i} visible={false}>
+      {segmentBodies.map((_, i) => (
+        <mesh ref={(el) => { segmentRefs.current[i] = el; }} key={i} visible={false}>
           <boxGeometry args={[0.05, SEGMENT_LENGTH, 0.05]} />
           <meshStandardMaterial />
         </mesh>

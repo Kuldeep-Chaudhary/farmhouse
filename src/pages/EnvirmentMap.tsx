@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { Environment, OrbitControls } from '@react-three/drei'
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
+import { RGBELoader } from 'three-stdlib'
 import { TextureLoader } from 'three'
 
 const EnvirmentMap = () => {
-  const [envMap, setEnvMap] = useState(null)
+  const [envMap, setEnvMap] = useState<any>(null)
 
   // Try loading the HDR environment map
   useEffect(() => {

@@ -47,18 +47,18 @@ const TitleBoard: React.FC = () => {
       guiRef.current = gui;
 
       const textFolder = gui.addFolder("Text3D");
-      textFolder.addColor(params, "color").onChange((v) => updateParam("color", v));
+      textFolder.addColor(params, "color").onChange((v: string) => updateParam("color", v));
       const textPos = textFolder.addFolder("Text Position");
       textPos.add(params.textPosition, 0, -50, 50, 1).name("X").onChange(posUpdate("textPosition", 0));
       textPos.add(params.textPosition, 1, -50, 50, 1).name("Y").onChange(posUpdate("textPosition", 1));
       textPos.add(params.textPosition, 2, -50, 50, 1).name("Z").onChange(posUpdate("textPosition", 2));
 
       const pillarFolder = gui.addFolder("Pillars");
-      pillarFolder.addColor(params, "leftPillarColor").onChange((v) => updateParam("leftPillarColor", v));
-      pillarFolder.addColor(params, "rightPillarColor").onChange((v) => updateParam("rightPillarColor", v));
+      pillarFolder.addColor(params, "leftPillarColor").onChange((v: string) => updateParam("leftPillarColor", v));
+      pillarFolder.addColor(params, "rightPillarColor").onChange((v: string) => updateParam("rightPillarColor", v));
 
       const boardFolder = gui.addFolder("Board");
-      boardFolder.addColor(params, "boardColor").onChange((v) => updateParam("boardColor", v));
+      boardFolder.addColor(params, "boardColor").onChange((v: string) => updateParam("boardColor", v));
 
       const advancedFolder = gui.addFolder("Advanced Config");
 
@@ -71,7 +71,7 @@ const TitleBoard: React.FC = () => {
       light.add(params.directionalLightPosition, 0, -50, 50, 1).name("X").onChange(posUpdate("directionalLightPosition", 0));
       light.add(params.directionalLightPosition, 1, -50, 50, 1).name("Y").onChange(posUpdate("directionalLightPosition", 1));
       light.add(params.directionalLightPosition, 2, -50, 50, 1).name("Z").onChange(posUpdate("directionalLightPosition", 2));
-      light.add(params, "intensity", 0, 5, 0.1).name("Intensity").onChange((v) => updateParam("intensity", v));
+      light.add(params, "intensity", 0, 5, 0.1).name("Intensity").onChange((v: number) => updateParam("intensity", v));
 
       const pillarSize = advancedFolder.addFolder("Pillar Size");
       pillarSize.add(params.pillarSize, 0, 0.1, 10, 0.1).name("RadiusTop").onChange(posUpdate("pillarSize", 0));
@@ -114,25 +114,25 @@ const TitleBoard: React.FC = () => {
       <ambientLight intensity={0.5} />
       <directionalLight
         castShadow
-        position={params.directionalLightPosition}
+        position={params.directionalLightPosition as any}
         intensity={params.intensity}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
 
-      <group ref={boardRef} position={params.groupPosition}>
-        <mesh position={params.leftPillarPosition} castShadow receiveShadow>
-          <cylinderGeometry args={params.pillarSize} />
+      <group ref={boardRef} position={params.groupPosition as any}>
+        <mesh position={params.leftPillarPosition as any} castShadow receiveShadow>
+          <cylinderGeometry args={params.pillarSize as any} />
           <meshStandardMaterial color={params.leftPillarColor} />
         </mesh>
 
-        <mesh position={params.rightPillarPosition} castShadow receiveShadow>
-          <cylinderGeometry args={params.pillarSize} />
+        <mesh position={params.rightPillarPosition as any} castShadow receiveShadow>
+          <cylinderGeometry args={params.pillarSize as any} />
           <meshStandardMaterial color={params.rightPillarColor} />
         </mesh>
 
         <mesh
-          position={params.boardPosition}
+          position={params.boardPosition as any}
           castShadow
           receiveShadow
           onClick={(e) => {
@@ -140,7 +140,7 @@ const TitleBoard: React.FC = () => {
             if (e.altKey) handleBoardClick();
           }}
         >
-          <boxGeometry args={params.boardSize} />
+          <boxGeometry args={params.boardSize as any} />
           <meshStandardMaterial color={params.boardColor} />
         </mesh>
 
@@ -154,11 +154,11 @@ const TitleBoard: React.FC = () => {
           bevelSize={0.02}
           bevelOffset={0}
           bevelSegments={5}
-          position={params.textPosition}
+          position={params.textPosition as any}
           castShadow
           receiveShadow
         >
-          B h i t a  F A R M H O U S E
+          C H A U D H A R Y ' S   F A R M H O U S E
           <meshStandardMaterial color={params.color} metalness={0.3} roughness={0.4} />
         </Text3D>
       </group>

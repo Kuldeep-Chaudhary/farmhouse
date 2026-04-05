@@ -6,6 +6,7 @@ import colorGroundImg from "../assets/textures/ground/pavement_03_diff_1k.jpg";
 import armGroundImg from "../assets/textures/ground/pavement_03_arm_1k.jpg";
 import normalGroundImg from "../assets/textures/ground/pavement_03_nor_gl_1k.jpg";
 import { usePlane } from "@react-three/cannon";
+import * as THREE from "three";
 
 const InfiniteGround: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null); // Ref for the mesh

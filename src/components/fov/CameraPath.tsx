@@ -20,7 +20,8 @@ export const PathHelper = ({ curve }: { curve: THREE.Curve<THREE.Vector3> }) => 
   const points = curve.getPoints(50);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   return (
-    <line geometry={geometry}>
+    // @ts-expect-error React 19 line conflict
+    <line geometry={geometry as any}>
       <lineBasicMaterial attach="material" color="hotpink" />
     </line>
   );

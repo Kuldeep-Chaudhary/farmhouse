@@ -26,7 +26,7 @@ const Home: React.FC = () => {
   const [isHailstoneActive, setIsHailstoneActive] = useState(false);
   const [Phoenix, setPhoenix] = useState(false);
 
-  const skySunPosition = isNight ? [100, -5, 100] : [100, 10, -300];
+  const skySunPosition: [number, number, number] = isNight ? [100, -5, 100] : [100, 10, -300];
   const backgroundColor = isNight ? "#0a0a1a" : "skyblue"; // optional bg color change
 
   const buttons = [
@@ -103,7 +103,7 @@ const Home: React.FC = () => {
 
         <Physics
           gravity={[0, -9.82, 0]}
-          fixedTimeStep={1 / 60}
+          stepSize={1 / 60}
           maxSubSteps={10}
         >
           <Rain isActive={isRaining} />
@@ -133,7 +133,6 @@ const Home: React.FC = () => {
           />
           <Bird
             isActive={Phoenix}
-            targetPosition={{ x: -80, y: -1, z: titleBoard.groupPosition[2] }}
           />
 
           {/* 🏗️ Scene */}

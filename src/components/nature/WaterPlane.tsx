@@ -26,7 +26,7 @@ export const WaterPlane: React.FC = () => {
       transparent: true,
       opacity: 0.3,
       depthWrite: false,
-    });
+    } as any);
 
     water.rotation.x = -Math.PI / 2;
     water.position.y = 0.14;

@@ -8,7 +8,7 @@ const CatMovement: React.FC = () => {
   const [isNight, setIsNight] = useState(false); // 🌙 Night toggle
 
 
-  const skySunPosition = isNight ? [100, -5, 100] : [100, 10, -300];
+  const skySunPosition: [number, number, number] = isNight ? [100, -5, 100] : [100, 10, -300];
   const backgroundColor = isNight ? "#0a0a1a" : "skyblue"; // optional bg color change
 
   return (
@@ -25,7 +25,7 @@ const CatMovement: React.FC = () => {
           position={[10, 10, 10]}
           intensity={isNight ? 0.1 : 1.5}
         />
-        <Physics gravity={[0, -9.82, 0]} fixedTimeStep={1 / 60} maxSubSteps={10}> 
+        <Physics gravity={[0, -9.82, 0]} stepSize={1 / 60} maxSubSteps={10}> 
 
         <Rope/>
 

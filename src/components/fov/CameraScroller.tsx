@@ -27,9 +27,9 @@ const CameraScroller: React.FC = () => {
 
   useEffect(() => {
     // Initialize camera
-    camera.position.set(...hutCameraPositions[0]);
+    camera.position.set(hutCameraPositions[0][0], hutCameraPositions[0][1], hutCameraPositions[0][2]);
     currentPos.current.copy(camera.position);
-    currentLookAt.current.set(...hutLookAtPositions[0]);
+    currentLookAt.current.set(hutLookAtPositions[0][0], hutLookAtPositions[0][1], hutLookAtPositions[0][2]);
     targetLookAt.current.copy(currentLookAt.current);
 
     // Setup GUI for debugging
@@ -87,8 +87,8 @@ const CameraScroller: React.FC = () => {
     const posArr = lerpArray(hutCameraPositions[index], hutCameraPositions[index + 1], t);
     const lookArr = lerpArray(hutLookAtPositions[index], hutLookAtPositions[index + 1], t);
 
-    targetPosition.current.set(...posArr);
-    targetLookAt.current.set(...lookArr);
+    targetPosition.current.set(posArr[0], posArr[1], posArr[2]);
+    targetLookAt.current.set(lookArr[0], lookArr[1], lookArr[2]);
 
     // Lerp camera position and lookAt smoothly
     currentPos.current.lerp(targetPosition.current, 0.1);

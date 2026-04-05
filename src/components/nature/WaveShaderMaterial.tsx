@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const WaveShaderMaterial = () => {
-  const materialRef = useRef<any>();
+  const materialRef = useRef<any>(null);
 
   const vertexShader = `
     uniform float uTime;
@@ -33,8 +33,8 @@ const WaveShaderMaterial = () => {
   `;
 
   return (
-    <mesh>
-      <planeGeometry  rotation={[-Math.PI / 2, 0, 0]} args={[50, 50, 256, 256]} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[50, 50, 256, 256]} />
       <shaderMaterial
         ref={materialRef}
         args={[
