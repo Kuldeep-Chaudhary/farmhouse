@@ -11,10 +11,10 @@ function App() {
   return (
     <>
      <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/cat" element={<CatMovement />} />
         <Route path='/environment' element={<EnvirmentMap/>}/>
-        <Route path='/' element={<RealsticRender/>}/>
+        <Route path='/map' element={<RealsticRender/>}/>
         <Route path='/fiber' element={<CustomFiber/>}/>
       </Routes>
     </>

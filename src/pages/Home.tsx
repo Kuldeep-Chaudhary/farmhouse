@@ -91,7 +91,7 @@ const Home: React.FC = () => {
         style={{ width: "100%", height: "100%", background: backgroundColor }}
         camera={{ position: [0, 40, 160], fov: 75 }}
       >
-        {/* <CameraScroller /> */}
+        <CameraScroller />
         <Sky
           sunPosition={skySunPosition}
           turbidity={8}
@@ -107,7 +107,7 @@ const Home: React.FC = () => {
           maxSubSteps={10}
         >
           <Rain isActive={isRaining} />
-          <WaterPlane />
+          {/* <WaterPlane /> */}
 
           {/* 💡 Lights */}
           <ambientLight intensity={isNight ? 0.3 : 1} />
@@ -147,9 +147,9 @@ const Home: React.FC = () => {
         </Physics>
 
         <OrbitControls
-          enableZoom
-          enablePan={true}
-          enableRotate
+          // enableZoom
+          // enablePan={true}
+          // enableRotate
           minPolarAngle={Math.PI / 6}
           maxPolarAngle={1.5}
         />

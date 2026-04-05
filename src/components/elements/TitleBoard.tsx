@@ -158,7 +158,7 @@ const TitleBoard: React.FC = () => {
           castShadow
           receiveShadow
         >
-          C H A U D H A R Y   F A R M H O U S E
+          B h i t a  F A R M H O U S E
           <meshStandardMaterial color={params.color} metalness={0.3} roughness={0.4} />
         </Text3D>
       </group>
